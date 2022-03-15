@@ -29,6 +29,49 @@
             </MdInput>
           </el-form-item>
           <el-row>
+            <el-col :span="24">
+              <el-form-item
+                prop="category"
+                label="分類: "
+                :label-width="labelWidth"
+              >
+                <el-select v-model="postForm.category" placeholder="請選擇分類">
+                  <el-option label="ComputerScience" :value="1"></el-option>
+                  <el-option label="SocialSciences" :value="2"></el-option>
+                  <el-option label="Economics" :value="3"></el-option>
+                  <el-option label="Education" :value="4"></el-option>
+                  <el-option label="Engineering" :value="5"></el-option>
+                  <el-option label="Environment" :value="6"></el-option>
+                  <el-option label="Geography" :value="7"></el-option>
+                  <el-option label="History" :value="8"></el-option>
+                  <el-option label="Laws" :value="9"></el-option>
+                  <el-option label="LifeSciences" :value="10"></el-option>
+                  <el-option label="Literature" :value="11"></el-option>
+                  <el-option label="Biomedicine" :value="12"></el-option>
+                  <el-option
+                    label="BusinessandManagement"
+                    :value="13"
+                  ></el-option>
+                  <el-option label="EarthSciences" :value="14"></el-option>
+                  <el-option label="MaterialsScience" :value="15"></el-option>
+                  <el-option label="Mathematics" :value="16"></el-option>
+                  <el-option
+                    label="MedicineAndPublicHealth"
+                    :value="17"
+                  ></el-option>
+                  <el-option label="Philosophy" :value="18"></el-option>
+                  <el-option label="Physics" :value="19"></el-option>
+                  <el-option
+                    label="PoliticalScienceAndInternationalRelations"
+                    :value="20"
+                  ></el-option>
+                  <el-option label="Psychology" :value="21"></el-option>
+                  <el-option label="Statistics" :value="22"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
             <el-col :span="12">
               <el-form-item
                 prop="author"
@@ -173,6 +216,7 @@ import MdInput from "../../../components/MDinput";
 import { createBook, updateBook, getBook } from "../../../api/book";
 
 const defaultForm = {
+  category: "",
   title: "",
   author: "",
   publisher: "",
@@ -188,6 +232,7 @@ const defaultForm = {
 };
 
 const fields = {
+  category: "分類",
   title: "書名",
   author: "作者",
   publisher: "出版社",
@@ -221,6 +266,7 @@ export default {
       labelWidth: "120px",
       contentsTree: [],
       rules: {
+        category: [{ validator: validateRequire }],
         title: [{ validator: validateRequire }],
         author: [{ validator: validateRequire }],
         publisher: [{ validator: validateRequire }],
@@ -243,6 +289,14 @@ export default {
     isEdit: Boolean,
   },
   methods: {
+    beforeUpload(file) {
+      if (!this.postForm.category) {
+        this.$message({
+          message: "請選擇該電子書的分類",
+          type: "error",
+        });
+      }  
+    },
     getBookData(fileName) {
       getBook(fileName).then((response) => {
         this.setData(response.data);
@@ -305,6 +359,40 @@ export default {
       this.setDefault();
     },
     showGuide() {},
+    findCategoryText(category) {
+      let categoryText=''
+      const categoryList = [
+        "ComputerScience",
+        "SocialSciences",
+        "Economics",
+        "Education",
+        "Engineering",
+        "Environment",
+        "Geography",
+        "History",
+        "Laws",
+        "LifeSciences",
+        "Literature",
+        "Biomedicine",
+        "BusinessandManagement",
+        "EarthSciences",
+        "MaterialsScience",
+        "Mathematics",
+        "MedicineAndPublicHealth",
+        "Philosophy",
+        "Physics",
+        "PoliticalScienceAndInternationalRelations",
+        "Psychology",
+        "Statistics",
+      ];
+      categoryList.forEach((item, key) => {
+        if (key + 1 === category) {
+          console.log(item);
+          categoryText = item;
+        }
+      });
+      return categoryText;
+    },
     submitForm() {
       const onSuccess = (response) => {
         const { msg } = response;
@@ -321,6 +409,8 @@ export default {
         this.$refs.postForm.validate((valid, fields) => {
           if (valid) {
             const book = { ...this.postForm };
+            const categoryText = this.findCategoryText(book.category);
+            book.categoryText=categoryText
             delete book.contentsTree;
             if (!this.isEdit) {
               createBook(book)

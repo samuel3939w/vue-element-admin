@@ -28,7 +28,7 @@
 
 <script>
 import { getToken } from "@/utils/auth";
-import { removeBook } from "../../api/book";
+import { removeBook, createCategory } from "../../api/book";
 
 export default {
   props: {
@@ -57,7 +57,7 @@ export default {
   },
   methods: {
     beforeUpload(file) {
-      this.$emit("beforeUpload", file);
+      
     },
     onSuccess(response, file) {
       const { code, msg, data } = response;
